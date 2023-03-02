@@ -3,7 +3,7 @@ import {Utils} from '../utils';
 import {config} from '../config';
 import {SecondPageScenario} from './second-page-scenario';
 import {FirstPageScenario} from './first-page-scenario';
-
+import {UPDATE_INTERVAL, UPDATE_COUNT} from '../const';
 /**
  * Returns true if slot found
  * @param wd webdriver
@@ -25,18 +25,23 @@ export const findSlot = async (wd: WebDriver): Promise<boolean> => {
   await SecondPageScenario.selectApplyCategory(wd);
   await SecondPageScenario.selectApplyReason(wd);
   await SecondPageScenario.waitForLoadingScreen(wd);
-  await SecondPageScenario.clickNext(wd);
+  for (var _i = 1; _i <= UPDATE_COUNT; _i++) {
+    await SecondPageScenario.clickNext(wd);
 
-  try {
-    const box = await Utils.waitUntilVisible(
-      wd,
-      By.xpath('//*[@id="messagesBox"]/ul/li')
-    );
-    const text = await box.getText();
-    console.log(`[findSlot]: ${text}`);
-  } catch (e) {
-    console.error(`[findSlot]: error ${e}`);
-    return true;
+    try {
+      const box = await Utils.waitUntilVisible(
+        wd,
+        By.xpath('//*[@id="messagesBox"]/ul/li')
+      );
+      const text = await box.getText();
+      console.log(`[findSlot]: ${text}`);
+    } catch (e) {
+      console.error(`[findSlot]: error ${e}`);
+      return true;
+    }
+    await wd.sleep(UPDATE_INTERVAL);
+    console.log(`[findSlot]: update ${_i}`);
+
   }
   return false;
 };
