@@ -4,6 +4,9 @@ import {config} from '../config';
 import {SecondPageScenario} from './second-page-scenario';
 import {FirstPageScenario} from './first-page-scenario';
 import {UPDATE_INTERVAL, UPDATE_COUNT} from '../const';
+import {FamilyScenario} from './family-scenario';
+import {EconomicActivityScenario} from './economic-activity-scenario';
+
 /**
  * Returns true if slot found
  * @param wd webdriver
@@ -22,26 +25,28 @@ export const findSlot = async (wd: WebDriver): Promise<boolean> => {
     config.partnerCitizenship
   );
   await SecondPageScenario.selectApplyPurpose(wd, config.reason);
-  await SecondPageScenario.selectApplyCategory(wd);
-  await SecondPageScenario.selectApplyReason(wd);
+  if (config.reason === 'family') {
+    await FamilyScenario.selectApplyCategory(wd);
+    await FamilyScenario.selectApplyReason(wd);
+  } else {
+    await EconomicActivityScenario.selectApplyCategory(wd);
+    await EconomicActivityScenario.selectApplyReason(wd);
+  }
   await SecondPageScenario.waitForLoadingScreen(wd);
   for (var _i = 1; _i <= UPDATE_COUNT; _i++) {
-    await SecondPageScenario.clickNext(wd);
+  await SecondPageScenario.clickNext(wd);
 
-    try {
-      const box = await Utils.waitUntilVisible(
-        wd,
-        By.xpath('//*[@id="messagesBox"]/ul/li')
-      );
-      const text = await box.getText();
-      console.log(`[findSlot]: ${text}`);
-    } catch (e) {
-      console.error(`[findSlot]: error ${e}`);
-      return true;
-    }
-    await wd.sleep(UPDATE_INTERVAL);
-    console.log(`[findSlot]: update ${_i}`);
-
+  try {
+    const box = await Utils.waitUntilVisible(
+      wd,
+      By.xpath('//*[@id="messagesBox"]/ul/li')
+    );
+    const text = await box.getText();
+    console.log(`[findSlot]: ${text}`);
+  } catch (e) {
+    console.error(`[findSlot]: error ${e}`);
+    return true;
+  }
   }
   return false;
 };
