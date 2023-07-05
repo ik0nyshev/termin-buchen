@@ -47,6 +47,8 @@ export const findSlot = async (wd: WebDriver): Promise<boolean> => {
     console.error(`[findSlot]: error ${e}`);
     return true;
   }
+  await wd.sleep(UPDATE_INTERVAL);
+  console.log(`[findSlot]: update ${_i}`);
   }
   return false;
 };
